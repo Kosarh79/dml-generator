@@ -3,7 +3,7 @@ SET DEFINE OFF;
 
 merge into issues iss
 using (select '{{ticketNumber}}' issue_number
-            , '$Id: /SPRINTS/{{dueYear}}/{{dueDate}}/{{ticketNumber}}/1__ABT_MAIN__iss{{ticketNumber}}__DML__{{newPresName}}.sql$' file_name
+            , '$Id: /SPRINTS/{{dueYear}}/{{dueDate}}/{{ticketNumber}}/1__ABT_MAIN__iss{{fileName}}.sql$' file_name
          from dual) nw
    on (iss.file_name = nw.file_name)
 when matched then update set iss.updated_ts = sysdate, iss.issue_number = nw.issue_number

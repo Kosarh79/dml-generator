@@ -1,6 +1,9 @@
 const fs = require('fs');
 const cmd = require('commander');
 const {prompt} = require('inquirer');
+const genFileName = function(ticketNumber, newPresName){
+  return `1__ABT_MAIN__iss${ticketNumber}__DML__${newPresName}`;
+}
 const questions = [
   {
     type: 'input',
@@ -43,6 +46,19 @@ cmd.command('gen-dml')
   .action(() => {
     prompt(questions).then((answers) => {
       console.log(answers);
-    })
+      let fileName = genFileName(answers.ticketNumber, answers.newPresName);
+      fs.readFile('./assets/dml.txt', 'utf8', (err, data) => {
+        data = data.replace('{{ticketNumber}}', answers.ticketNumber);
+        data = data.replace('{{dueDate}}', answers.dueDate);
+        data = data.replace('{{username}}', answers.username);
+        data = data.replace('{{templatePresId}}', answers.templatePresId);
+        data = data.replace('{{newpresId}}', answers.newpresId);
+        data = data.replace('{{fileName}}', fileName);
+        fs.writeFile(`${fileName}.sql`, data, (err) => {
+          if(err) throw err;
+          console.log('Done! go get it.');
+        });
+      });
+    });
   });
 cmd.parse(process.argv);
