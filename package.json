@@ -1,0 +1,9 @@
+{
+  "name": "Vega",
+  "version": "1.0.0",
+  "description": "Generate DML, DLP with all the fun you can have!"
+  "dependencies":{
+    "commander": "^2.13.0",
+    "inquirer": "^5.0.1"
+  }
+}
