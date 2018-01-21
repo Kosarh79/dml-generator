@@ -1,0 +1,773 @@
+SET SERVEROUTPUT ON;
+SET DEFINE OFF;
+
+merge into issues iss
+using (select 'LEND-17028' issue_number
+            , '$Id: /SPRINTS/2018/01_31_18/LEND-17028/2__ABT_MAIN__issLEND-17028__DML__LRE_MOBILE_LP_ROLLOUT_DLP.sql$' file_name
+         from dual) nw
+   on (iss.file_name = nw.file_name)
+when matched then update set iss.updated_ts = sysdate, iss.issue_number = nw.issue_number
+when not matched then insert values (sysdate, nw.issue_number, nw.file_name);
+
+declare
+	i_user                 VARCHAR2(255);@
+	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+	i_ce_value             VARCHAR2(20000);
+	o_errormsg             VARCHAR2(255);
+	err_code                number;
+begin
+	i_user := 'dlpTool';
+	i_content_element_id := 8021;
+	i_presentation_id := 28839;
+	i_ce_value := '#PAGE' || chr(10) ||
+	'dlp.page.style=position: relative;width: 100%; margin: 0 auto;  *z-index: 1000; _z-index: 1000;' || chr(10) ||
+	'dlp.page.css=.dlpPanel{ position:relative; overflow:hidden; font-family:Arial,sans-serif; font-size:12px;}body{	text-align: left; overflow-x: hidden;width: 100%;margin:0;padding:0;}.servertag{display:none;} body {background: none repeat scroll 0 0 #002850;}' || chr(10) ||
+	'#SPLASHPAGE' || chr(10) ||
+	'dlp.splashPage.type=text' || chr(10) ||
+	'dlp.splashPage.width=100%' || chr(10) ||
+	'dlp.splashPage.height=600px' || chr(10) ||
+	'dlp.splashPage.positionX=0px' || chr(10) ||
+	'dlp.splashPage.positionY=0px' || chr(10) ||
+	'dlp.splashPage.style=position:absolute;' || chr(10) ||
+	'dlp.splashPage.background.color=#002850' || chr(10) ||
+	'dlp.splashPage.zIndex=999' || chr(10) ||
+	'#DESCRIPTION' || chr(10) ||
+	'dlp.description.type=text' || chr(10) ||
+	'dlp.description.text=If you owe less than $625,000 on your home, use the President''s Refi Program. You may be shocked when you see how much you can save.' || chr(10) ||
+	'dlp.description.parentPanel.id=splashPage' || chr(10) ||
+	'dlp.description.style=padding:30px 0; width:95%; margin:auto;' || chr(10) ||
+	'dlp.description.font.size=17px' || chr(10) ||
+	'dlp.description.font.color=#FFF' || chr(10) ||
+	'dlp.description.alignment=center' || chr(10) ||
+	'#SPLASH_CONTINUE' || chr(10) ||
+	'dlp.splash_continue.type=image' || chr(10) ||
+	'dlp.splash_continue.src=/lending-images/theme/web_2.0/mobile/splash/rollout/continue.png' || chr(10) ||
+	'dlp.splash_continue.parentPanel.id=splashPage' || chr(10) ||
+	'dlp.splash_continue.style=padding:35px 0 0;' || chr(10) ||
+	'dlp.splash_continue.alignment=center';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+--------------
+-- CONTENT PAGE
+------------------------------------------------------
+--set serverout on;
+--set define off;
+--declare
+	--i_user                 VARCHAR2(255);
+	--i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+	--i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+	--i_ce_value             VARCHAR2(20000);
+	--o_errormsg             VARCHAR2(255);
+	--err_code                number;
+--begin
+	--i_user := 'dlpTool';
+	i_content_element_id := 8025;
+	--i_presentation_id := 28836;
+	i_ce_value := '#PAGE' || chr(10) ||
+		'dlp.page.width=100%' || chr(10) ||
+		'dlp.page.background.color=#F9F9F2' || chr(10) ||
+		'dlp.page.style=border:1px solid #E1E1E1; box-shadow: 0px 0px 5px 0px rgba(50, 50, 50, 0.2); overflow:hidden; padding: 0 0 20px 0;' || chr(10) ||
+		'dlp.page.css=#partnerLinks{display:none;} body{ background:#EEE; width:99%; text-align:left; margin:0px; padding:0px; } fieldset{ border:0px;}.hide{display:none; } .countTimer{color:#fff; margin-left:-1px; padding: 5px 0px 5px 3px; font-weight:bold;font-size:16px;font-family:''Freight Sans'',''lucida grande'',tahoma,verdana,arial,sans-serif;}.formField #zipCode {  width: 110px;}#stateCodeFieldset {  display: none;}#buttonContainer {  float: left;  left: 135px !important;}#logos {  display: none;}.disclosure {  display: none;}.segment2 { float: left; width: 23%; margin:0 1%; font-size:8vw; font-weight:400; background-color:#eeeeee;}.segment { float: left; width: 18%; text-align: center; margin:0 1%; font-size:8vw; font-weight:400; background-color:#006645; box-shadow:0 1px 5px rgba(0,0,0,0.2); } .timer2 { background-color:#eeeeee;color:#eeeeee;}.timer { background-color:#e5e5e5; margin-bottom:1%; text-shadow:0px 1px #FFF; } .labels2 { font-size:5vw; font-weight:300; background-color:#eeeeee; padding:3% 0;color:#eeeeee; }.labels { font-size:4vw; font-weight:300; background-color:#F5F5F5; padding:3% 0; } .clear{ clear:both; } #buttonContainer { left: -6px !important; } #loanType, #propertyDescription, #creditProfile, #zipCode { width:90%; height: 40px;    border:1px solid #002850;     -webkit-border-top-right-radius: 15px;     -webkit-border-bottom-right-radius: 15px;     -moz-border-radius-topright: 15px;     -moz-border-radius-bottomright: 15px;     border-top-right-radius: 15px;     border-bottom-right-radius: 15px;     padding:2px;}  #zipCodeTip { color: #fa2b33; display: block; font-size: 11px; left: 15px !important; position:absolute; top: 83px !important; width: 120px !important;}' ||
+		'.dlpPanel{font: normal 12px Arial, sans-serif; overflow: hidden; font-size:12px; } .bar::after{ content: "";left:77%;position: absolute; width: 0px;  height: 0px; border-top: 15px solid rgba(0, 0, 0, 0); border-bottom: 15px solid rgba(0, 0, 0, 0);  border-left: 15px solid #002850;  clear: both;    margin: 0px 0 0 21px;} .bar::before{ border:1px solid #002850; position:absolute; content: ""; display: inline-block;width:50px;height: 50px; margin: -10px 0 0 0; left:77%; border-radius:100px; background-color: #fff;}' ||
+		'fieldset{ border-width: 0px;  padding-top: 5px;  padding-bottom: 5px;}fieldset {  position: relative;}.field-prefix {  position: absolute;  top: 3px;  left: 214px;  _width: 0px;}.field-suffix {  position: absolute;  top: 3px;  left: 370px;}.field-tip {  position: relative;  left: 15px;  top: 0px;} .label {  float: none;  text-align: left;  padding-bottom: 5px;}.formField { margin: 0; width:60%} .formField input,.formField select {  font-size: 12px;  width: 265px;  height: 23px;}fieldset {  padding-left: 15px;}#links {  margin-bottom: 15px;}#footer {  width: 99%;  top: 55px; text-align:center; }body {  background: none repeat scroll 0 0 #EEEEEE;}#links a,#links a:visited,#links a:active {  font-size: 9px;}#copyright {padding-top: 0;  color: #C3C3C3; font:10.5px arial, sans-serif;}.formField input, .formField select {     font-size: 16px; }' ||
+		'#links { color: #666666;  font: 11px arial, sans-serif; padding-top: 16px;}#links a {  color: #666666;  font:9px arial, sans-serif;  text-decoration: none;  padding: 0 1px;}#links a,#links a:visited,#links a:active,#copyright a,#copyright a:visited,#copyright a:active {  color: #666666;  text-decoration: none;}#copyright a:hover,#links a:hover {  color: #ff6600;  text-decoration: underline;} #logos {  padding-top: 5px;}.servertag {  font-family: Arial, Verdana, sans-serif;  font-size: 9px; text-align:center;  color: #CCCCCC;  height: 35px;  position: relative;  padding-bottom: 65px;}.disclosure {  position: relative;  padding-bottom: 20px;  width: 750px;  text-align: center;}.page,#headline {  _width: 748px !important;}.page {  position: relative;  min-height: 400px;  width: 800px;  margin: 0 auto; *z-index: 1000;  _z-index: 1000;}' ||
+		'@media screen and (min-width: 500px){    #page{ padding-top:20px;}}'|| chr(10) ||
+		'' || chr(10) ||
+		'#COUNTDOWN' || chr(10) ||
+		'dlp.countdown.type=text' || chr(10) ||
+		'dlp.countdown.text=<div class="countTimer">Less Than A Year Remaining to Refinance Through HARP</div><div class="segment"> <div id="monthCell" class="timer">000</div><div class="labels"> MONTHS </div></div><div class="segment"> <div id="dayCell" class="timer">000</div> <div class="labels">DAYS</div> </div> <div class="segment"> <div id="hourCell" class="timer">00</div> <div class="labels">HOURS</div> </div> <div class="segment"> <div id="minuteCell" class="timer">00</div> <div class="labels">MIN</div> </div> <div class="segment"> <div id="secondCell" class="timer">00</div> <div class="labels">SEC</div> </div> <div class="clear"></div>' || chr(10) ||
+		'dlp.countdown.style=font-family:''Roboto'', sans-serif; padding: 0px 2px 10px 1px; background-color:#006645;margin-left:-1px; width: 100%; position: fixed; z-index: 5000; box-shadow:0 0 25px rgba(0,0,0,0.4);' || chr(10) ||
+		'dlp.countdown.positionY=0px' || chr(10) ||
+		'dlp.countdown.width=99.9%' || chr(10) ||
+		'' || chr(10) ||
+		'#COUNTDOWN2' || chr(10) ||
+		'dlp.countdown2.type=text' || chr(10) ||
+		'dlp.countdown2.text=<div class="countTimer">Less Than A Year Remaining to Refinance Through HARP</div><div class="segment2"><div id="dayCell" class="timer2">-</div> <div class="labels2">-</div> </div> <div class="clear"></div>' || chr(10) ||
+		'dlp.countdown2.style=display:none; font-family:''Roboto'', sans-serif; padding: 0px 2px 10px 1px; background-color:#eeeeee;;margin-left:-1px; ' || chr(10) ||
+		'' || chr(10) ||
+		'#HEADERLOGO' || chr(10) ||
+		'dlp.headerLogo.type=text' || chr(10) ||
+		'dlp.headerLogo.style=float:left; width:100%; height:110px; position:relative;     margin-top: 75px;padding:0px 0 10px 0px; background-color:#EEE; background: rgba(238,238,238,1); background: -moz-linear-gradient(top, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 95%, rgba(204,202,204,1) 100%); background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(238,238,238,1)), color-stop(95%, rgba(238,238,238,1)), color-stop(100%, rgba(204,202,204,1))); background: -webkit-linear-gradient(top, rgba(238,238,238,1) 0%, rgba(238,238,238,1) 95%, rgba(204,202,204,1) 100%); ' || chr(10) ||
+		'' || chr(10) ||
+		'#PERSONALFINANCETIPS' || chr(10) ||
+		'dlp.PersonalFinanceTips.type=text' || chr(10) ||
+		'dlp.PersonalFinanceTips.text=Personal Finance' || chr(10) ||
+		'dlp.PersonalFinanceTips.alignment=left' || chr(10) ||
+		'dlp.PersonalFinanceTips.font.size=17px' || chr(10) ||
+		'dlp.PersonalFinanceTips.style=padding:0px 0 5px 10px; margin-top:10px; z-index:9; height:40px; position:relative; width:220px; float:left;margin-left:0px;font-family:"Freight Sans","lucida grande",tahoma,verdana,arial,sans-serif !important;' || chr(10) ||
+		'dlp.PersonalFinanceTips.font.color=#3D8D72' || chr(10) ||
+		'dlp.PersonalFinanceTips.font.bold=y' || chr(10) ||
+		'dlp.PersonalFinanceTips.parentPanel.id=headerLogo' || chr(10) ||
+		'' || chr(10) ||
+		'#TIPS' || chr(10) ||
+		'dlp.tips.type=text' || chr(10) ||
+		'dlp.tips.parentPanel.id=PersonalFinanceTips' || chr(10) ||
+		'dlp.tips.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite.png' || chr(10) ||
+		'dlp.tips.style=background-position: 81% 70%; margin:0px 0 0 0px; right:0px; position:absolute; width:55px; height:45px; top:5px;' || chr(10) ||
+		'' || chr(10) ||
+		'#LOGO' || chr(10) ||
+		'dlp.logo.type=text' || chr(10) ||
+		'dlp.logo.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite.png' || chr(10) ||
+		'dlp.logo.style= width:210px; height:58px; padding:0 0 0 10px; position:absolute; bottom:20px; right:0px; text-align:left; background-position:98% 10%;' || chr(10) ||
+		'dlp.logo.parentPanel.id=headerLogo' || chr(10) ||
+		'' || chr(10) ||
+		'#CONTENTHEADER' || chr(10) ||
+		'dlp.contentHeader.type=text' || chr(10) ||
+		'dlp.contentHeader.text=Don''t Miss Your Chance To Use The HARP Refinance Program' || chr(10) ||
+		'dlp.contentHeader.style=color:#016645;width:97%; font-size:18px; top:-100px; text-align:left; padding:10px 5px; line-height:26px; ' || chr(10) ||
+		'dlp.contentHeader.font.bold=y' || chr(10) ||
+		'dlp.contentHeader.font.family="Freight Sans","lucida grande",tahoma,verdana,arial,sans-serif' || chr(10) ||
+		'' || chr(10) ||
+		'#DATE' || chr(10) ||
+		'dlp.date.type=text' || chr(10) ||
+		'dlp.date.text=<span id="theDate"></span>' || chr(10) ||
+		'dlp.date.style=padding:5px; display:block; text-align:left;' || chr(10) ||
+		'' || chr(10) ||
+		'#CONTENTDESCRIPTION' || chr(10) ||
+		'dlp.contentDescription.type=text' || chr(10) ||
+		'dlp.contentDescription.text=You can bet your lender doesn''t want you knowing this: there''s a government program created specially to help qualified homeowners refinance their mortgages and save money.<br><br>It''s called HARP, which stands for "Home Affordable Refinance Program", and despite launching early in 2009, less than 0.5% of people have taken advantage. It seems that very few homeowners know about it, or know how to use it, so most folks are missing out. HARP is designed to help you get a new, more affordable, more stable mortgage. It provides a once in a lifetime bailout and could be helping millions of homeowners save a substantial amount of money. Those in the know have reduced their mortgage payments by as much as $3,000/year.<br><br>The program expires in 2016, but there is still time to lock in the benefits of this refi bailout, as long as you take advantage before the deadline. You may be surprised by the shockingly low interest rates that are still available for qualified homeowners.' || chr(10) ||
+		'dlp.contentDescription.style=padding:2px 5px 8px;  color:#333333; width:97%; font-size:13px; text-align:left; line-height:21px;"Freight Sans","lucida grande",tahoma,verdana,arial,sans-serif;' || chr(10) ||
+		'dlp.contentDescription.parentPanel.id=contentWrap' || chr(10) ||
+		'' || chr(10) ||
+		'#HEADLINE' || chr(10) ||
+		'dlp.headline.type=text' || chr(10) ||
+		'dlp.headline.text=' || chr(10) ||
+		'dlp.headline.font.size=16px' || chr(10) ||
+		'dlp.headline.font.bold=y' || chr(10) ||
+		'dlp.headline.font.color=#002850' || chr(10) ||
+		'dlp.headline.alignment=center' || chr(10) ||
+		'dlp.headline.width=195px' || chr(10) ||
+		'' || chr(10) ||
+		'#AGESTATEMENT' || chr(10) ||
+		'dlp.ageStatement.type=text' || chr(10) ||
+		'dlp.ageStatement.style=color:#666666; z-index:99; font-size:10px; font-weight:bold !important; left:5px;  text-align:center; top:17px; position: relative; width:183px;' || chr(10) ||
+		'dlp.ageStatement.text=*According to your selection, you are <span id="clientAge">age</span> years of age and seeking a home refinance.' || chr(10) ||
+		'dlp.ageStatement.className=hide' || chr(10) ||
+		'' || chr(10) ||
+		'#FORM' || chr(10) ||
+		'dlp.form.loanType.labelText=<span style="font-size: 20px;margin-left:10px;">Loan Type</span>' || chr(10) ||
+		'dlp.form.stateCode.labelText=<span style="font-size: 20px;margin-left:10px;">Property State</span>' || chr(10) ||
+		'dlp.form.singleFamilyHome.labelText=<span style="font-size: 20px;">My Property is a Single Family Home</span>' || chr(10) ||
+		'dlp.form.homeDescriptionSansSingleFamily.labelText=<span style="font-size: 26px;">Home Description</span>' || chr(10) ||
+		'dlp.form.propertyDescription.labelText=<span style="font-size: 20px;margin-left:10px;">Home Type</span>' || chr(10) ||
+		'dlp.form.creditProfile.labelText=<span style="font-size: 20px;margin-left:10px;">Credit Type</span>' || chr(10) ||
+		'dlp.form.zipCode.labelText=<span style="font-size: 20px;margin-left:10px;">ZIP Code</span>' || chr(10) ||
+		'dlp.form.zipCode.maxLength=5' || chr(10) ||
+		'dlp.form.zipCode.filter=digits' || chr(10) ||
+		'dlp.form.alignment=left' || chr(10) ||
+		'dlp.form.font.bold=y' || chr(10) ||
+		'dlp.form.zIndex=0' || chr(10) ||
+		'dlp.form.font.color=#002850' || chr(10) ||
+		'dlp.form.style=padding-top: 170px; position:relative; top:0px; font-size:24px; overflow:visible;' || chr(10) ||
+		'dlp.form.zipCode.tip=Please enter a valid U.S. ZIP code' || chr(10) ||
+		'' || chr(10) ||
+		'#SUBMITBUTTON' || chr(10) ||
+		'dlp.submitButton.type=text' || chr(10) ||
+		'dlp.submitButton.style=cursor: pointer; width:99%; height:90px; z-index:100; margin-top:20px; position:relative;' || chr(10) ||
+		'' || chr(10) ||
+		'#BAR' || chr(10) ||
+		'dlp.bar.type=text' || chr(10) ||
+		'dlp.bar.text=Continue' || chr(10) ||
+		'dlp.bar.style=width:76%; padding: 0 20px 3px 0px; background-color:#002850; height:30px; margin:30px 0 0 0; font-size:30px; color:#FFF; font-weight:bold; text-align:right;' || chr(10) ||
+		'dlp.bar.className=bar' || chr(10) ||
+		'dlp.bar.parentPanel.id=submitButton' || chr(10) ||
+		'' || chr(10) ||
+		'#BACKDROP' || chr(10) ||
+		'dlp.backdrop.type=text' || chr(10) ||
+		'dlp.backdrop.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite.png' || chr(10) ||
+		'dlp.backdrop.style=margin:0 0 0 5%; z-index:999; position:absolute; bottom:20px; height:81px; width:85px; background-position: -299px -130px;' || chr(10) ||
+		'dlp.backdrop.parentPanel.id=submitButton' || chr(10) ||
+		'' || chr(10) ||
+		'#TAP' || chr(10) ||
+		'dlp.tap.type=text' || chr(10) ||
+		'dlp.tap.text=Tap above to proceed' || chr(10) ||
+		'dlp.tap.style=color:#666; text-align:right; width:75%; position:relative; top:-10px; font-size:14px;' || chr(10) ||
+		'dlp.tap.font.bold=y' || chr(10) ||
+		'' || chr(10) ||
+		'#BACKBUTTON' || chr(10) ||
+		'dlp.backButton.type=text' || chr(10) ||
+		'dlp.backButton.text=<< BACK' || chr(10) ||
+		'dlp.backButton.font.underline=y' || chr(10) ||
+		'dlp.backButton.font.bold=y' || chr(10) ||
+		'dlp.backButton.style=cursor:pointer; bottom:0px; disclosure:inline-block; padding:15px 10px; font-size:14px;' || chr(10) ||
+		'' || chr(10) ||
+		'#HERO' || chr(10) ||
+		'dlp.hero.type=text' || chr(10) ||
+		'dlp.hero.parentPanel.id=application' || chr(10) ||
+		'dlp.hero.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite.png' || chr(10) ||
+		'dlp.hero.style=background-position:0 -34px; height:367px; width:290px; top:0px; float:right; position:absolute; z-index:-1; text-align:right; right:0px; ' || chr(10) ||
+		'' || chr(10) ||
+		'#VALIDATOR' || chr(10) ||
+		'dlp.validator.type=text' || chr(10) ||
+		'dlp.validator.parentPanel.id=zipCodeFieldset' || chr(10) ||
+		'dlp.validator.width=40px' || chr(10) ||
+		'dlp.validator.style=z-index: 999;top:35px !important; position:absolute; background: url(https://release.lowermybills.com/lending-images/theme/web_2.0/page/fnl_pages/mobile/lend9185.png) no-repeat 0 0;' || chr(10) ||
+		'' || chr(10) ||
+		'#CONTENTPARAGRAPH3CONTINUE' || chr(10) ||
+		'dlp.contentParagraph3Continue.type=text' || chr(10) ||
+		'dlp.contentParagraph3Continue.text=In the President''s State of the Union address, he told homeowners that if they refinanced at today''s historically low rates, they could save up to $3,000. This statement can be found in the State of the Union transcript:<br/><a target="_blank" href="http://www.whitehouse.gov/the-press-office/2012/01/24/remarks-president-state-union-address" style="color:#333;text-decoration:none;">www.whitehouse.gov/the-press-office/2012/01/24/remarks-president-state-union-address</a>. Additionally, homeowners who refinance from 30 year fixed mortgages to 15 year fixed mortgages can save up to $145,000. Further information: <a target="_blank" href="http://www.nytimes.com/2011/08/21/realestate/exploring-the-15-year-loan-for-refinancing-mortgages.html" style="color:#333;text-decoration:none;">www.nytimes.com/2011/08/21/realestate/exploring-the-15-year-loan-for-refinancing-mortgages.html.</a><br/><br/>Under provision of the Making Homes Affordable Act (a.k.a. HARP 2.0), signed into law by President Obama, Fannie Mae has removed certain loan requirements, including the Loan-To-Value (LTV) ceiling for fixed-rate mortgage, property appraisal and eliminated & lowered certain fees for borrowers making it easier to refinance into a lower rate mortgage, effectively reducing the amount of interest paid (and owed) over the life of the loan. More info:<br/> <a target="_blank" href="http://www.fhfa.gov/media/publicaffairs/publicaffairsdocuments/harp_release_102411_final.pdf" style="color:#333;text-decoration:none;">www.fhfa.gov/webfiles/22721/HARP_release_102411_Final.pdf </a><br/><br/> This is an advertorial and not an actual news article, blog, or consumer protection update.' || chr(10) ||
+		'dlp.contentParagraph3Continue.style=text-align:left;color:#333333; font-size:9px; padding:30px 5px 10px; width:97%;' || chr(10) ||
+		'' || chr(10) ||
+		'#TRUSTS' || chr(10) ||
+		'dlp.trusts.type=text' || chr(10) ||
+		'dlp.trusts.text=&nbsp;' || chr(10) ||
+		'dlp.trusts.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite.png' || chr(10) ||
+		'dlp.trusts.style=margin:0 auto;  background-repeat:no-repeat; height:35px; width:315px; background-position:-6% 0px; display:block;';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+--------------------------------------------
+-- MOBILE LP PAGE
+---------------------------------------------------------------------
+--set serverout on;
+--set define off;
+--declare
+--	i_user                 VARCHAR2(255);
+--	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+--	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+--	i_ce_value             VARCHAR2(20000);
+--	o_errormsg             VARCHAR2(255);
+--	err_code                number;
+--begin
+	--i_user := 'dlpTool';
+	i_content_element_id := 7000;
+	--i_presentation_id := 28836;
+	i_ce_value := '#PAGE' || chr(10) ||
+		'dlp.page.zIndex=1000' || chr(10) ||
+		'dlp.page.width=100%' || chr(10) ||
+		'dlp.page.css =.hide{ display:none;}.ages{margin-top:210px !important;} .servertag {font-size:9px;text-align:center;color:#CCC;padding:10px 0 50px 0;}.submitBar::after{ content: "";left:77%;position: absolute; width: 0px;  height: 0px; border-top: 15px solid rgba(0, 0, 0, 0); border-bottom: 15px solid rgba(0, 0, 0, 0);  border-left: 15px solid #002850;  clear: both;    margin: 0px 0 0 21px;} .submitBar::before{ border:1px solid #002850; position:absolute; content: ""; display: inline-block;width:50px;height: 50px; margin: -10px 0 0 0; left:77%; border-radius:100px; background-color: #fff;} .segment .labels {font-size: 4vw;font-weight: 300; background-color: #F5F5F5; color:#000; padding: 3% 0;} .timer {background-color: #e5e5e5; color:#000; margin-bottom: 1%;text-shadow: 0px 1px #FFF; } .segment { float: left; width: 18%; text-align: center;  margin: 0 1%; font-size: 7vw; font-weight: 400; background-color: #ccc;box-shadow: 0 1px 5px rgba(0,0,0,0.2);} .dlpPanel{font-family:Arial, sans-serif; font-size:12px; }body { margin:0px; padding:0px;} br{display:none;} #footers a {color: #989898;}body{width:100%}.singleHomefieldStyle{font-size: 20px;}.homeDescfieldStyle{font-size: 26px;}.fieldStyle{font-size: 20px;margin-left:10px;} #loanType, #propertyDescription, #creditProfile, #zipCode { width:90%; height: 40px; border:1px solid #002850;-webkit-border-top-right-radius: 15px; -webkit-border-bottom-right-radius: 15px; -moz-border-radius-topright: 15px; -moz-border-radius-bottomright: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; padding:2px;} .formField input, .formField select {font-size: 16px; } body {background-image:url(https://dev.lowermybills.com/lending-images/theme/web_2.0/page/landing_page/design_element/lend16007/lend16007_goldscale.png); background-repeat:repeat;} .segment { float: left; width: 18%; text-align: center; margin:0 1%; font-size:7vw; font-weight:400; background-color:#ccc; box-shadow:0 1px 5px rgba(0,0,0,0.2); }.timer { background-color:#e5e5e5; margin-bottom:1%; text-shadow:0px 1px #FFF; } .label{width:100%;}.labels { font-size:4vw; font-weight:300; background-color:#F5F5F5; padding:3% 0; }fieldset{padding:0px 5px 0px 20px; border:0px;}.formField select{width:100% !important;} ' ||
+		'.formField{margin:5px 0 0 0;height:50px;}#zipCodeFieldset div.formField #zipCode{width:120px !important;} #zipCodeTip{display: block; color: #FA2B33;font-size: 11px;width:120px !important;} #countdownHeader br{ display:block;}.step2::before, .step1::before{ background-position:-325px -105px; background-image:url(/lending-images/theme/web_2.0/mobile/Content/sprite_lp.png); background-repeat:no-repeat; position:absolute; top:-6px; content: ""; display: inline-block; width: 118px; height: 120px; left:0%;   border-radius:100px; } .step2::before{ background-position:-410px -105px;}  fieldset .formField span{ position:absolute; font-size:11px;} fieldset { position:relative; padding: 5px 5px 5px 20px; border:0px;} .formField{ height:50px; margin: 5px 0 0 0; float:left; } #buttonContainer{display:none;}'  || chr(10) ||
+		'' || chr(10) ||
+		'#COUNTDOWNHEADER' || chr(10) ||
+		'dlp.countdownHeader.type=text' || chr(10) ||
+		'dlp.countdownHeader.text=' || chr(10) ||
+		'dlp.countdownHeader.font.color=#ffffff' || chr(10) ||
+		'dlp.countdownHeader.font.size=17px' || chr(10) ||
+		'dlp.countdownHeader.style=background-color:#002850;display:flex; width:100%; margin-left:-1px; padding: 50px 0 0px 0px; ' || chr(10) ||
+		'dlp.countdownHeader.font.family="Freight Sans","lucida grande",tahoma,verdana,arial,sans-serif' || chr(10) ||
+		'dlp.countdownHeader.font.bold=y' || chr(10) ||
+		'dlp.countdownHeader.alignment=left' || chr(10) ||
+		'' || chr(10) ||
+		'#stopwatch' || chr(10) ||
+		'dlp.stopwatch.type=text' || chr(10) ||
+		'dlp.stopwatch.text=' || chr(10) ||
+		'dlp.stopwatch.background.image=/lending-images/theme/web_2.0/page/landing_page/design_element/LEND-16349/lend16349_stopwatch.png' || chr(10) ||
+		'dlp.stopwatch.style=display:flex; position:absolute; top:5px; width:45px; background-repeat:no-repeat; left:5px; height:48px; z-index:1; ' || chr(10) ||
+		'dlp.stopwatch.parentPanel.id=countdownHeader' || chr(10) ||
+		'' || chr(10) ||
+		'#COUNTDOWNTEXT' || chr(10) ||
+		'dlp.countdownText.type=text' || chr(10) ||
+		'dlp.countdownText.text=OBAMA REFI PLAN<br> EXPIRATION DATE: 12/31/18<br>' || chr(10) ||
+		'dlp.countdownText.font.color=#ffffff' || chr(10) ||
+		'dlp.countdownText.font.size=17px' || chr(10) ||
+		'dlp.countdownText.font.bold=y' || chr(10) ||
+		'dlp.countdownText.style=background-color:#002850;display:flex; position:absolute; top:0px; width:80%; left:48px;  padding: 5px 0 0px 5px; ' || chr(10) ||
+		'dlp.countdownText.font.family="Freight Sans","lucida grande",tahoma,verdana,arial,sans-serif' || chr(10) ||
+		'dlp.countdownText.parentPanel.id=countdownHeader' || chr(10) ||
+		'' || chr(10) ||
+		'#COUNTDOWN' || chr(10) ||
+		'dlp.countdown.type=text' || chr(10) ||
+		'dlp.countdown.text=<div class="segment"> <div id="monthCell" class="timer">00</div> <div class="labels">MONTHS</div> </div> <div class="segment"> <div id="dayCell" class="timer">000</div> <div class="labels">DAYS</div> </div> <div class="segment"> <div id="hourCell" class="timer">00</div> <div class="labels">HOURS</div> </div> <div class="segment"> <div id="minuteCell" class="timer">00</div> <div class="labels">MIN</div> </div> <div class="segment"> <div id="secondCell" class="timer">00</div> <div class="labels">SEC</div> </div> <div class="clear"></div>' || chr(10) ||
+		'dlp.countdown.style=font-family:''Roboto'', sans-serif; padding: 3px 2px 5px 1px; background-color:#002850;margin-left:-1px; display:flex;' || chr(10) ||
+		'dlp.countdown.width=99%' || chr(10) ||
+		'dlp.countdown.parentPanel.id=countdownHeader' || chr(10) ||
+		'' || chr(10) ||
+		'#HEADLINE' || chr(10) ||
+		'dlp.headline.type=text' || chr(10) ||
+		'dlp.headline.text=President Passed HARP To Provide A Boost To The Middle Class' || chr(10) ||
+		'dlp.headline.style= margin-top:15px;float:left; clear:both; padding:0 0 0 10px; font-weight:bold; display:inline-block; position:relative; z-index:99; width:60%;' || chr(10) ||
+		'dlp.headline.font.size=16px' || chr(10) ||
+		'dlp.headline.font.bold=y' || chr(10) ||
+		'dlp.headline.font.color=#002850' || chr(10) ||
+		'dlp.headline.alignment=center' || chr(10) ||
+		'' || chr(10) ||
+		'#AGESTATEMENT' || chr(10) ||
+		'dlp.ageStatement.type=text' || chr(10) ||
+		'dlp.ageStatement.style=color:#666666; float:left; clear:both; font-size:10px; font-weight:bold !important; position:relative; z-index:99;  text-align:center; margin-top:3px; float:left; margin-left:5px; width:183px;' || chr(10) ||
+		'dlp.ageStatement.text=*According to your selection, you are <span id="clientAge">age</span> years of age and seeking a home refinance.' || chr(10) ||
+		'dlp.ageStatement.className=hide' || chr(10) ||
+		'' || chr(10) ||
+		'#FORM' || chr(10) ||
+		'dlp.form.loanType.labelText=<span class="fieldStyle">Loan Type</span>' || chr(10) ||
+		'dlp.form.stateCode.labelText=<span class="fieldStyle">Property State</span>' || chr(10) ||
+		'dlp.form.singleFamilyHome.labelText=<span class="singleHomefieldStyle">My Property is a Single Family Home</span>' || chr(10) ||
+		'dlp.form.homeDescriptionSansSingleFamily.labelText=<span class="homeDescfieldStyle">Home Description</span>' || chr(10) ||
+		'dlp.form.propertyDescription.labelText=<span class="fieldStyle">Home Type</span>' || chr(10) ||
+		'dlp.form.creditProfile.labelText=<span class="fieldStyle">Credit Type</span>' || chr(10) ||
+		'dlp.form.zipCode.labelText=<span class="fieldStyle">ZIP Code</span>' || chr(10) ||
+		'dlp.form.zipCode.maxLength=5' || chr(10) ||
+		'dlp.form.zipCode.filter=digits' || chr(10) ||
+		'dlp.form.alignment=left' || chr(10) ||
+		'dlp.form.font.bold=y' || chr(10) ||
+		'dlp.form.zIndex=0' || chr(10) ||
+		'dlp.form.button.image=Continue' || chr(10) ||
+		'dlp.form.button.positionY=10px' || chr(10) ||
+		'dlp.form.font.color=#002850' || chr(10) ||
+		'dlp.form.font.size=24px' || chr(10) ||
+		'dlp.form.style=overflow:visible; margin-top:180px; height:175px; display:block; position:relative;' || chr(10) ||
+		'' || chr(10) ||
+		'#HERO' || chr(10) ||
+		'dlp.hero.type=text' || chr(10) ||
+		'dlp.hero.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite_lp.png' || chr(10) ||
+		'dlp.hero.width=303px' || chr(10) ||
+		'dlp.hero.height=365px' || chr(10) ||
+		'dlp.hero.positionY=-145px' || chr(10) ||
+		'dlp.hero.zIndex=-10' || chr(10) ||
+		'dlp.hero.alignment=right' || chr(10) ||
+		'dlp.hero.parentPanel.id=application' || chr(10) ||
+		'dlp.hero.style= position:absolute; right:0px; background-position: 0px -35px;' || chr(10) ||
+		'' || chr(10) ||
+		'#BOTTOMPANEL' || chr(10) ||
+		'dlp.submitButton.type=text' || chr(10) ||
+		'dlp.submitButton.style=display:flex; position:relative; min-height:115px;' || chr(10) ||
+		'' || chr(10) ||
+		'#BAR' || chr(10) ||
+		'dlp.bar.type=text' || chr(10) ||
+		'dlp.bar.text=Press to Continue' || chr(10) ||
+		'dlp.bar.height=30px' || chr(10) ||
+		'dlp.bar.background.color=#002850' || chr(10) ||
+		'dlp.bar.width=75%' || chr(10) ||
+		'dlp.bar.alignment=right' || chr(10) ||
+		'dlp.bar.style=font-weight:normal; font-size:18px; float:left; color:#FFF; padding-right:20px; margin:60px 0 0 0; line-height:30px;' || chr(10) ||
+		'dlp.bar.parentPanel.id=submitButton' || chr(10) ||
+		'dlp.bar.className=submitBar' || chr(10) ||
+		'' || chr(10) ||
+		'#TAP' || chr(10) ||
+		'dlp.tap.type=text' || chr(10) ||
+		'dlp.tap.text=Tap to See Results' || chr(10) ||
+		'dlp.tap.font.color=#666' || chr(10) ||
+		'dlp.tap.alignment=center' || chr(10) ||
+		'dlp.tap.font.size=14px' || chr(10) ||
+		'dlp.tap.style=display:block; text-align:center;' || chr(10) ||
+		'dlp.tap.font.bold=y' || chr(10) ||
+		'' || chr(10) ||
+		'#BACKBUTTON' || chr(10) ||
+		'dlp.backButton.type=text' || chr(10) ||
+		'dlp.backButton.zIndex=1001' || chr(10) ||
+		'dlp.backButton.text=<< BACK' || chr(10) ||
+		'dlp.backButton.font.size=16px' || chr(10) ||
+		'dlp.backButton.font.underline=y' || chr(10) ||
+		'dlp.backButton.font.bold=y' || chr(10) ||
+		'dlp.backButton.alignment=left' || chr(10) ||
+		'dlp.backButton.style=cursor:pointer; padding:15px 0px 15px 10px;' || chr(10) ||
+		'' || chr(10) ||
+		'#FOOTERS' || chr(10) ||
+		'dlp.footers.type=text' || chr(10) ||
+		'dlp.footers.text=<a class="footerLinks" href="/lending/presentations/common/includes/popupContent/mobile-terms.html" target="_blank">Terms of Use</a> | <a class="footerLinks" href="https://www.lowermybills.com/legal/privacy.php" target="_blank">Privacy</a> | <a class="footerLinks" href="/legal/licenses.php" target="_blank">Licenses & Disclosures</a>' || chr(10) ||
+		'dlp.footers.zIndex=20' || chr(10) ||
+		'dlp.footers.font.color=#989898' || chr(10) ||
+		'dlp.footers.height=20px' || chr(10) ||
+		'dlp.footers.alignment=center' || chr(10) ||
+		'dlp.footers.style=margin:20px 0 0 0; display:block: clear:both;' || chr(10) ||
+		'dlp.footers.font.size=9px' || chr(10) ||
+		'' || chr(10) ||
+		'#PROCESSINGOVERLAY' || chr(10) ||
+		'dlp.processingOverlay.type=text' || chr(10) ||
+		'dlp.processingOverlay.height=800px' || chr(10) ||
+		'dlp.processingOverlay.width=100%' || chr(10) ||
+		'dlp.processingOverlay.zIndex=25' || chr(10) ||
+		'dlp.processingOverlay.positionX=0' || chr(10) ||
+		'dlp.processingOverlay.positionY=0' || chr(10) ||
+		'dlp.processingOverlay.background.color=#ffffff' || chr(10) ||
+		'dlp.processingOverlay.style=position:fixed; opacity:0.9;padding-top:130px;display:none;' || chr(10) ||
+		'dlp.processingOverlay.text=<h1>One moment please...</h1>' || chr(10) ||
+		'dlp.processingOverlay.alignment=center' || chr(10) ||
+		'' || chr(10) ||
+		'#LOADINGOUTER' || chr(10) ||
+		'dlp.loadingOuter.type=text' || chr(10) ||
+		'dlp.loadingOuter.parentPanel.id=processingOverlay' || chr(10) ||
+		'dlp.loadingOuter.width=280px' || chr(10) ||
+		'dlp.loadingOuter.height=50px' || chr(10) ||
+		'dlp.loadingOuter.background.color=#CCC' || chr(10) ||
+		'dlp.loadingOuter.style=margin-left:-105px;margin-top:-200px;position:absolute;' || chr(10) ||
+		'dlp.loadingOuter.positionX=40%' || chr(10) ||
+		'dlp.loadingOuter.positionY=40%' || chr(10) ||
+		'' || chr(10) ||
+		'#LOADINGINNER' || chr(10) ||
+		'dlp.loadingInner.type=text' || chr(10) ||
+		'dlp.loadingInner.parentPanel.id=loadingOuter' || chr(10) ||
+		'dlp.loadingInner.height=100%' || chr(10) ||
+		'dlp.loadingInner.width=7%' || chr(10) ||
+		'dlp.loadingInner.style=background:  #437CA2;background: -moz-linear-gradient(top,  #437CA2 0%, #2E5670 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#437CA2), color-stop(100%,#2E5670)); background: -webkit-linear-gradient(top,  #437CA2 0%,#2E5670 100%); background: -o-linear-gradient(top,  #437CA2 0%,#2E5670 100%); background: -ms-linear-gradient(top,  #437CA2 0%,#2E5670 100%); background: linear-gradient(to bottom,  #437CA2 0%,#2E5670 100%); -webkit-animation:loader 10s ease-out 0 infinite normal; -moz-animation:loader 10s ease-out infinite normal; animation:loader 10s ease-out 0 infinite normal;position:absolute;' || chr(10) ||
+		'' || chr(10) ||
+		'#VALIDATOR' || chr(10) ||
+		'dlp.validator.type=text' || chr(10) ||
+		'dlp.validator.parentPanel.id=zipCodeFieldset' || chr(10) ||
+		'dlp.validator.width=40px' || chr(10) ||
+		'dlp.validator.background.image=/lending-images/theme/web_2.0/mobile/Content/sprite_lp.png' || chr(10) ||
+		'dlp.validator.height=50px' || chr(10) ||
+		'dlp.validator.style=display:none; z-index:20; width: 50px; height:50px; position: absolute; top:40px; background-repeat:no-repeat; background-position: -298px -244px; left:150px;' || chr(10) ||
+		'' || chr(10) ||
+		'#DISCLOSURE' || chr(10) ||
+		'dlp.disclosure.type=text' || chr(10) ||
+		'dlp.disclosure.text=LowerMyBills, Inc. is not acting as a lender or broker. The information provided by you to LowerMyBills is not an application for a mortgage loan, nor is it used to pre-qualify you with any lender. If you are contacted by a lender or broker advertising within our network, your quoted rate may be higher depending on your property location, credit score, loan-to-value ratio, debt-to-income ratio, and/or other factors. LowerMyBills does not offer its matching services in all states.This loan may not be available for all credit types, and not all service providers in the LowerMyBills network offer this or other products with interest-only options.' || chr(10) ||
+		'dlp.disclosure.font.color=#cccccc' || chr(10) ||
+		'dlp.disclosure.font.size=9px' || chr(10) ||
+		'dlp.disclosure.alignment=left' || chr(10) ||
+		'dlp.disclosure.style= padding:30px 10px 10px 10px; display:block; clear:both;' || chr(10) ||
+		'' || chr(10) ||
+		'#disclosureRM' || chr(10) ||
+		'dlp.disclosureRM.type=text' || chr(10) ||
+		'dlp.disclosureRM.text= Interested consumers may receive information on a variety of financial services products, including but not limited to, refinance, reverse mortgages and home equity line of credit. Reverse mortgages allow eligible homeowners, 62 and older, to covert home equity into income. Federal law requires lenders to provide HUD-approved third party counseling prior to processing any Reverse Mortgage applications. Consumerand property qualification requirements apply. Reverse Mortgages not available for all consumers.' || chr(10) ||
+		'dlp.disclosureRM.positionY=-200px' || chr(10) ||
+		'dlp.disclosureRM.zIndex=20' || chr(10) ||
+		'dlp.disclosureRM.font.color=#989898' || chr(10) ||
+		'dlp.disclosureRM.alignment=center' || chr(10) ||
+		'dlp.disclosureRM.font.size=9px' || chr(10) ||
+		'dlp.disclosureRM.width=99%';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+-------------------------------------
+-- LRE MOBILE MONTANA LINK OFFLIN
+-------------------------------------------
+--set serverout on;
+--set define off;
+--declare
+--	i_user                 VARCHAR2(255);
+--	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+--	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+--	i_ce_value             VARCHAR2(20000);
+--	o_errormsg             VARCHAR2(255);
+--	err_code                number;
+--begin
+	--i_user := 'dlpTool';
+	i_content_element_id := 8069;
+	--i_presentation_id := 28836;
+	i_ce_value := '#PAGE'|| chr(10) ||
+		'dlp.page.abandonMsg=No time to fill out a form? Just click CANCEL below to go straight to today''s mortgage rates from some of the nation''s top lenders.'|| chr(10) ||
+		'dlp.page.style=position:static;padding-left:1.5%;'|| chr(10) ||
+		''|| chr(10) ||
+		'#FORM'|| chr(10) ||
+		'dlp.form.zipCode.labelText=Property ZIP Code'|| chr(10) ||
+		'dlp.form.zipCode.maxLength=5'|| chr(10) ||
+		'dlp.form.zipCode.filter=digits'|| chr(10) ||
+		'dlp.form.needLoanFor.labelText=I am interested in financing'|| chr(10) ||
+		'dlp.form.purchaseYear.labelText=Purchase Year'|| chr(10) ||
+		'dlp.form.homeValue.labelText=Estimated Home Value'|| chr(10) ||
+		'dlp.form.mortgageBank.labelText=Mortgage With'|| chr(10) ||
+		'dlp.form.mortgage1Balance.labelText=Mortgage Balance'|| chr(10) ||
+		'dlp.form.mortgage1InterestRate.labelText=Mortgage Interest Rate'|| chr(10) ||
+		'dlp.form.cashOut.labelText=Additional cash you wish to borrow?'|| chr(10) ||
+		'dlp.form.font.bold=y'|| chr(10) ||
+		'dlp.form.font.size=12px'|| chr(10) ||
+		'dlp.form.alignment=left'|| chr(10) ||
+		'dlp.form.em.font.size=11px'|| chr(10) ||
+		'dlp.form.em.font.color=#339900'|| chr(10) ||
+		'dlp.form.zIndex=12'|| chr(10) ||
+		'dlp.form.button.positionX=5px'|| chr(10) ||
+		'dlp.form.cashIn.labelText=Cash-In'|| chr(10) ||
+		'dlp.form.positionY=30px'|| chr(10) ||
+		'dlp.form.button.positionY=0px'|| chr(10) ||
+		'dlp.form.background.color=#fff'|| chr(10) ||
+		'dlp.form.style=display:none;position:static;'|| chr(10) ||
+		'dlp.form.cashOut.formField.style=display: block;'|| chr(10) ||
+		'dlp.form.cashIn.formField.style=display:block;'|| chr(10) ||
+		''|| chr(10) ||
+		'#QUIGOLINKOFFCONTENT'|| chr(10) ||
+		'dlp.quigoLinkoffContent.type=text'|| chr(10) ||
+		'dlp.quigoLinkoffContent.zIndex=999'|| chr(10) ||
+		'dlp.quigoLinkoffContent.alignment=left'|| chr(10) ||
+		'dlp.quigoLinkoffContent.style=position:absolute;'|| chr(10) ||
+		'dlp.quigoLinkoffContent.background.color=#FFF'|| chr(10) ||
+		'dlp.quigoLinkoffContent.width=90%'|| chr(10) ||
+		'dlp.quigoLinkoffContent.height=auto'|| chr(10) ||
+		'dlp.quigoLinkoffContent.positionY=250px'|| chr(10) ||
+		'dlp.quigoLinkoffContent.style=min-height:500px;'|| chr(10) ||
+		''|| chr(10) ||
+		'#SIGNOFF'|| chr(10) ||
+		'dlp.signOff.type=text'|| chr(10) ||
+		'dlp.signOff.src=/lending-images/theme/web_2.0/page/ocp/design_element/signOff.gif'|| chr(10) ||
+		'dlp.signOff.style=position:static;margin-left:11%; display:none;'|| chr(10) ||
+		'dlp.signOff.height=120px'|| chr(10) ||
+		'dlp.signOff.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/signOff.gif'|| chr(10) ||
+		'dlp.signOff.width=266px'|| chr(10) ||
+		''|| chr(10) ||
+		'#CSS'|| chr(10) ||
+		'dlp.css.type=text'|| chr(10) ||
+		'dlp.css.text=<style>.dlpPanel{position: absolute;font: normal 12px Arial, sans-serif; overflow: hidden;}.nextSteps{font-weight:bold;}body, .page{width:98% !important;} #button{ display:none; }.servertag{display:none !important;}#stateCityCodes{font-weight: bold !important;}#vantageMediaLinkoffFrame {  width: 100%;  height: 730px;}#quigoLinkoffContent {  padding: 10px;}#whatComesNext ul { margin: 10px 0 0 10px;padding: 0px;}#whatComesNext {  font-size: 13px;}#whatComesNext ul li {  color: #000;  padding-left: 15px;  list-style: none;  line-height: 10px;  font-size: 9px;  padding-top: 4px;}#whatComesNext ul li.none {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/1.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.two {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/2.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.three {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/3.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.four {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/4.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#navigation {  right: 0px !important;}#navigation a:link,#navigation a:visited {  display: inline-block;  padding: 0 5px 0 10px;}</style>'|| chr(10) ||
+		''|| chr(10) ||
+		'#HEADER'|| chr(10) ||
+		'dlp.Header.type=text'|| chr(10) ||
+		'dlp.Header.width=100%'|| chr(10) ||
+		'dlp.Header.height=278px'|| chr(10) ||
+		'dlp.Header.positionX=0px'|| chr(10) ||
+		'dlp.Header.positionY=40px'|| chr(10) ||
+		'dlp.Header.zIndex=1'|| chr(10) ||
+		'dlp.Header.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/lend8617/background.jpg'|| chr(10) ||
+		''|| chr(10) ||
+		'#ARROW'|| chr(10) ||
+		'dlp.arrow.type=text'|| chr(10) ||
+		'dlp.arrow.width=120px'|| chr(10) ||
+		'dlp.arrow.height=280px'|| chr(10) ||
+		'dlp.arrow.positionX=3px'|| chr(10) ||
+		'dlp.arrow.positionY=5px'|| chr(10) ||
+		'dlp.arrow.zIndex=7'|| chr(10) ||
+		'dlp.arrow.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/arrow.png'|| chr(10) ||
+		'dlp.arrow.style=background-repeat:no-repeat;'|| chr(10) ||
+		''|| chr(10) ||
+		'#WHATCOMESNEXT'|| chr(10) ||
+		'dlp.whatComesNext.type=text'|| chr(10) ||
+		'dlp.whatComesNext.text=<span class="nextSteps">You have completed the first step in finding the lowest rates in </span><span id="stateCityCodes">City, State</span> <ul class="nextSteps"> <li class="none">Click on the loan options below that interest you. </li> <li class="two">Check your credit (optional). </li><li class="three">Get personalized rate quotes from lenders. </li><li class="four">Feel free to ask them questions.</li></ul>'|| chr(10) ||
+		'dlp.whatComesNext.parentPanel.id=Header'|| chr(10) ||
+		'dlp.whatComesNext.alignment=left'|| chr(10) ||
+		'dlp.whatComesNext.width=63%'|| chr(10) ||
+		'dlp.whatComesNext.style=right:5px;'|| chr(10) ||
+		'dlp.whatComesNext.positionY=10px'|| chr(10) ||
+		'dlp.whatComesNext.font.color=#6cb310'|| chr(10) ||
+		''|| chr(10) ||
+		'#TOPLINE'|| chr(10) ||
+		'dlp.topLine.type=text'|| chr(10) ||
+		'dlp.topLine.width=100%'|| chr(10) ||
+		'dlp.topLine.height=2px'|| chr(10) ||
+		'dlp.topLine.positionX=0px'|| chr(10) ||
+		'dlp.topLine.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/dotted_line.png'|| chr(10) ||
+		'dlp.topLine.positionY=40px'|| chr(10) ||
+		'dlp.topLine.zIndex=6'|| chr(10) ||
+		''|| chr(10) ||
+		'#BOTTOMLINE'|| chr(10) ||
+		'dlp.bottomLine.type=text'|| chr(10) ||
+		'dlp.bottomLine.width=100%'|| chr(10) ||
+		'dlp.bottomLine.zIndex=5'|| chr(10) ||
+		'dlp.bottomLine.height=2px'|| chr(10) ||
+		'dlp.bottomLine.positionY=217px'|| chr(10) ||
+		'dlp.bottomLine.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/dotted_line.png'|| chr(10) ||
+		'dlp.bottomLine.positionX=0px'|| chr(10) ||
+		''|| chr(10) ||
+		'#NAVIGATION'|| chr(10) ||
+		'dlp.navigation.type=text'|| chr(10) ||
+		'dlp.navigation.text=<a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/equal.png"</a> <a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/thawte.png"</a> <a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/mortgagebankers.png"</a>'|| chr(10) ||
+		'dlp.navigation.width=98%'|| chr(10) ||
+		'dlp.navigation.height=35px'|| chr(10) ||
+		'dlp.navigation.positionX=0px'|| chr(10) ||
+		'dlp.navigation.positionY=3px'|| chr(10) ||
+		'dlp.navigation.alignment=right';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+
+
+-------------------------------------
+-- LRE MOBILE MOBMAN LINK OFF
+-------------------------------------------
+--set serverout on;
+--set define off;
+--declare
+--	i_user                 VARCHAR2(255);
+--	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+--	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+--	i_ce_value             VARCHAR2(20000);
+--	o_errormsg             VARCHAR2(255);
+--	err_code                number;
+--begin
+--	i_user := 'dlpTool';
+	i_content_element_id := 8068;
+--	i_presentation_id := 28836;
+	i_ce_value := '#PAGE'|| chr(10) ||
+		'dlp.page.abandonMsg=No time to fill out a form? Just click CANCEL below to go straight to today''s mortgage rates from some of the nation''s top lenders.'|| chr(10) ||
+		'dlp.page.style=position:static;padding-left:1.5%;'|| chr(10) ||
+		''|| chr(10) ||
+		'#FORM'|| chr(10) ||
+		'dlp.form.zipCode.labelText=Property ZIP Code'|| chr(10) ||
+		'dlp.form.zipCode.maxLength=5'|| chr(10) ||
+		'dlp.form.zipCode.filter=digits'|| chr(10) ||
+		'dlp.form.needLoanFor.labelText=I am interested in financing'|| chr(10) ||
+		'dlp.form.purchaseYear.labelText=Purchase Year'|| chr(10) ||
+		'dlp.form.homeValue.labelText=Estimated Home Value'|| chr(10) ||
+		'dlp.form.mortgageBank.labelText=Mortgage With'|| chr(10) ||
+		'dlp.form.mortgage1Balance.labelText=Mortgage Balance'|| chr(10) ||
+		'dlp.form.mortgage1InterestRate.labelText=Mortgage Interest Rate'|| chr(10) ||
+		'dlp.form.cashOut.labelText=Additional cash you wish to borrow?'|| chr(10) ||
+		'dlp.form.font.bold=y'|| chr(10) ||
+		'dlp.form.font.size=12px'|| chr(10) ||
+		'dlp.form.alignment=left'|| chr(10) ||
+		'dlp.form.em.font.size=11px'|| chr(10) ||
+		'dlp.form.em.font.color=#339900'|| chr(10) ||
+		'dlp.form.zIndex=12'|| chr(10) ||
+		'dlp.form.button.positionX=5px'|| chr(10) ||
+		'dlp.form.cashIn.labelText=Cash-In'|| chr(10) ||
+		'dlp.form.positionY=30px'|| chr(10) ||
+		'dlp.form.button.positionY=0px'|| chr(10) ||
+		'dlp.form.background.color=#fff'|| chr(10) ||
+		'dlp.form.style=display:none;position:static;'|| chr(10) ||
+		'dlp.form.cashOut.formField.style=display: block;'|| chr(10) ||
+		'dlp.form.cashIn.formField.style=display:block;'|| chr(10) ||
+		''|| chr(10) ||
+		'#QUIGOLINKOFFCONTENT'|| chr(10) ||
+		'dlp.quigoLinkoffContent.type=text'|| chr(10) ||
+		'dlp.quigoLinkoffContent.zIndex=999'|| chr(10) ||
+		'dlp.quigoLinkoffContent.alignment=left'|| chr(10) ||
+		'dlp.quigoLinkoffContent.style=position:absolute;'|| chr(10) ||
+		'dlp.quigoLinkoffContent.background.color=#FFF'|| chr(10) ||
+		'dlp.quigoLinkoffContent.width=90%'|| chr(10) ||
+		'dlp.quigoLinkoffContent.height=auto'|| chr(10) ||
+		'dlp.quigoLinkoffContent.positionY=250px'|| chr(10) ||
+		'dlp.quigoLinkoffContent.style=min-height:500px;'|| chr(10) ||
+		''|| chr(10) ||
+		'#SIGNOFF'|| chr(10) ||
+		'dlp.signOff.type=text'|| chr(10) ||
+		'dlp.signOff.src=/lending-images/theme/web_2.0/page/ocp/design_element/signOff.gif'|| chr(10) ||
+		'dlp.signOff.style=position:static;margin-left:11%; display:none;'|| chr(10) ||
+		'dlp.signOff.height=120px'|| chr(10) ||
+		'dlp.signOff.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/signOff.gif'|| chr(10) ||
+		'dlp.signOff.width=266px'|| chr(10) ||
+		''|| chr(10) ||
+		'#CSS'|| chr(10) ||
+		'dlp.css.type=text'|| chr(10) ||
+		'dlp.css.text=<style>.dlpPanel{position: absolute;font: normal 12px Arial, sans-serif; overflow: hidden;}.nextSteps{font-weight:bold;}body, .page{width:98% !important;} #button{ display:none; }.servertag{display:none !important;}#stateCityCodes{font-weight: bold !important;}#vantageMediaLinkoffFrame {  width: 100%;  height: 730px;}#quigoLinkoffContent {  padding: 10px;}#whatComesNext ul { margin: 10px 0 0 10px;padding: 0px;}#whatComesNext {  font-size: 13px;}#whatComesNext ul li {  color: #000;  padding-left: 15px;  list-style: none;  line-height: 10px;  font-size: 9px;  padding-top: 4px;}#whatComesNext ul li.none {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/1.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.two {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/2.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.three {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/3.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#whatComesNext ul li.four {  background: url("/lending-images/theme/web_2.0/page/ocp/design_element/xsell/4.png") no-repeat;  background-position-y: 3px;  background-size: 10px 10px;}#navigation {  right: 0px !important;}#navigation a:link,#navigation a:visited {  display: inline-block;  padding: 0 5px 0 10px;}</style>'|| chr(10) ||
+		''|| chr(10) ||
+		'#HEADER'|| chr(10) ||
+		'dlp.Header.type=text'|| chr(10) ||
+		'dlp.Header.width=100%'|| chr(10) ||
+		'dlp.Header.height=278px'|| chr(10) ||
+		'dlp.Header.positionX=0px'|| chr(10) ||
+		'dlp.Header.positionY=40px'|| chr(10) ||
+		'dlp.Header.zIndex=1'|| chr(10) ||
+		'dlp.Header.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/lend8617/background.jpg'|| chr(10) ||
+		''|| chr(10) ||
+		'#ARROW'|| chr(10) ||
+		'dlp.arrow.type=text'|| chr(10) ||
+		'dlp.arrow.width=120px'|| chr(10) ||
+		'dlp.arrow.height=280px'|| chr(10) ||
+		'dlp.arrow.positionX=3px'|| chr(10) ||
+		'dlp.arrow.positionY=5px'|| chr(10) ||
+		'dlp.arrow.zIndex=7'|| chr(10) ||
+		'dlp.arrow.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/arrow.png'|| chr(10) ||
+		'dlp.arrow.style=background-repeat:no-repeat;'|| chr(10) ||
+		''|| chr(10) ||
+		'#WHATCOMESNEXT'|| chr(10) ||
+		'dlp.whatComesNext.type=text'|| chr(10) ||
+		'dlp.whatComesNext.text=<span class="nextSteps">You have completed the first step in finding the lowest rates in </span><span id="stateCityCodes">City, State</span> <ul class="nextSteps"> <li class="none">Click on the loan options below that interest you. </li> <li class="two">Check your credit (optional). </li><li class="three">Get personalized rate quotes from lenders. </li><li class="four">Feel free to ask them questions.</li></ul>'|| chr(10) ||
+		'dlp.whatComesNext.parentPanel.id=Header'|| chr(10) ||
+		'dlp.whatComesNext.alignment=left'|| chr(10) ||
+		'dlp.whatComesNext.width=63%'|| chr(10) ||
+		'dlp.whatComesNext.style=right:5px;'|| chr(10) ||
+		'dlp.whatComesNext.positionY=10px'|| chr(10) ||
+		'dlp.whatComesNext.font.color=#6cb310'|| chr(10) ||
+		''|| chr(10) ||
+		'#TOPLINE'|| chr(10) ||
+		'dlp.topLine.type=text'|| chr(10) ||
+		'dlp.topLine.width=100%'|| chr(10) ||
+		'dlp.topLine.height=2px'|| chr(10) ||
+		'dlp.topLine.positionX=0px'|| chr(10) ||
+		'dlp.topLine.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/dotted_line.png'|| chr(10) ||
+		'dlp.topLine.positionY=40px'|| chr(10) ||
+		'dlp.topLine.zIndex=6'|| chr(10) ||
+		''|| chr(10) ||
+		'#BOTTOMLINE'|| chr(10) ||
+		'dlp.bottomLine.type=text'|| chr(10) ||
+		'dlp.bottomLine.width=100%'|| chr(10) ||
+		'dlp.bottomLine.zIndex=5'|| chr(10) ||
+		'dlp.bottomLine.height=2px'|| chr(10) ||
+		'dlp.bottomLine.positionY=217px'|| chr(10) ||
+		'dlp.bottomLine.background.image=/lending-images/theme/web_2.0/page/ocp/design_element/xsell/dotted_line.png'|| chr(10) ||
+		'dlp.bottomLine.positionX=0px'|| chr(10) ||
+		''|| chr(10) ||
+		'#NAVIGATION'|| chr(10) ||
+		'dlp.navigation.type=text'|| chr(10) ||
+		'dlp.navigation.text=<a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/equal.png"</a> <a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/thawte.png"</a> <a href="javascript:void(0)"><img src="/lending-images/theme/web_2.0/page/ocp/design_element/xsell/mortgagebankers.png"</a>'|| chr(10) ||
+		'dlp.navigation.width=98%'|| chr(10) ||
+		'dlp.navigation.height=35px'|| chr(10) ||
+		'dlp.navigation.positionX=0px'|| chr(10) ||
+		'dlp.navigation.positionY=3px'|| chr(10) ||
+		'dlp.navigation.alignment=right';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+
+--------------------------------------
+ -- CONTENT PAGE SKIP
+ ---------------------------------------
+--set serverout on;
+--set define off;
+--declare
+--	i_user                 VARCHAR2(255);
+--	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+--	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+--	i_ce_value             VARCHAR2(20000);
+--	o_errormsg             VARCHAR2(255);
+--	err_code                number;
+--begin
+--	i_user := 'dlpTool';
+	i_content_element_id := 8040;
+	--i_presentation_id := 28836;
+	i_ce_value := 'contentSkip=true';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+--end;
+--/
+
+--set serverout on;
+--set define off;
+--declare
+--	i_user                 VARCHAR2(255);
+--	i_presentation_id      lmbw_abt_presentation_elements.presentation_id%TYPE;
+--	i_content_element_id   lmbw_abt_presentation_elements.content_element_id%TYPE;
+--	i_ce_value             VARCHAR2(20000);
+--	o_errormsg             VARCHAR2(255);
+--	err_code                number;
+--begin
+--	i_user := 'dlpTool';
+	i_content_element_id := 8042;
+--	i_presentation_id := 28836;
+	i_ce_value := 'isMobileSplashOff=false';
+	err_code := abt_main.lmbw_abt_definitions_pkg.modify_pc_element(i_user, i_presentation_id, i_content_element_id, i_ce_value, o_errormsg);
+	if err_code <> 0 then
+		dbms_output.put_line('r_code: '|| err_code);
+		dbms_output.put_line('o_errormsg: '|| o_errormsg);
+		rollback;
+	else
+		insert into krushing.cache_control (application, region, app_user) values ('LENDING', 'CE', i_user);
+		commit;
+	end if;
+end;
+/

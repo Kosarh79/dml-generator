@@ -1,0 +1,81 @@
+SET SERVEROUTPUT ON;
+SET DEFINE OFF;
+
+merge into issues iss
+using (select '{{ticketNumber}}' issue_number
+            , '$Id: /SPRINTS/{{dueYear}}/{{dueDate}}/{{ticketNumber}}/1__ABT_MAIN__iss{{ticketNumber}}__DML__{{newPresName}}.sql$' file_name
+         from dual) nw
+   on (iss.file_name = nw.file_name)
+when matched then update set iss.updated_ts = sysdate, iss.issue_number = nw.issue_number
+when not matched then insert values (sysdate, nw.issue_number, nw.file_name);
+
+DECLARE
+	USER_NAME                 VARCHAR2(255);
+	REF_NUMBER                ABT_MAIN.PRESENTATIONS.REF_NUMBER%TYPE;
+	TEMPLATE_PRES_ID          ABT_MAIN.LMBW_ABT_PRESENTATIONS.PRESENTATION_ID%TYPE;
+	NEW_PRES_NAME             ABT_MAIN.LMBW_ABT_PRESENTATIONS.NAME%TYPE;
+	NEW_PRES_ID               ABT_MAIN.LMBW_ABT_PRESENTATIONS.PRESENTATION_ID%TYPE;
+	NEW_PAGE_NAME             ABT_MAIN.LMBW_ABT_PAGES.NAME%TYPE;
+    NEW_PAGE_ID               ABT_MAIN.LMBW_ABT_PAGES.PAGE_ID%TYPE;
+    NEW_PAGE_URL              LMBW_ABT_PAGES.PAGE_URL%TYPE;
+    TEMPLATE_PAGE_ID          LMBW_ABT_PAGES.PAGE_ID%TYPE;
+    LOGICAL_PAGE_ID           ABT_MAIN.LMBW_ABT_LOGICAL_PAGES.LOGICAL_PAGE_ID%TYPE;
+    LHE_FUNNEL_REDIRECT       ABT_MAIN.LMBW_ABT_LOGICAL_PAGES.LOGICAL_PAGE_ID%TYPE;
+    LHP_FUNNEL_REDIRECT       ABT_MAIN.LMBW_ABT_LOGICAL_PAGES.LOGICAL_PAGE_ID%TYPE;
+    LRE_FUNNEL_REDIRECT       ABT_MAIN.LMBW_ABT_LOGICAL_PAGES.LOGICAL_PAGE_ID%TYPE;
+    LRE_TC_FUNNEL_REDIRECT    ABT_MAIN.LMBW_ABT_LOGICAL_PAGES.LOGICAL_PAGE_ID%TYPE;
+	NEW_NAVIGATION_ID         ABT_MAIN.LMBW_ABT_NAVIGATIONS.NAVIGATION_ID%TYPE;
+	TEMPLATE_NAVIGATION_ID    ABT_MAIN.LMBW_ABT_NAVIGATIONS.NAVIGATION_ID%TYPE;
+	NEW_NAV_NAME              ABT_MAIN.LMBW_ABT_NAVIGATIONS.NAME%TYPE;
+	O_NAV_ID                  LMBW_ABT_NAVIGATIONS.NAVIGATION_ID%TYPE;
+	NEW_NAV_DESC              ABT_MAIN.LMBW_ABT_NAVIGATIONS.DESCRIPTION%TYPE;
+	NEW_FIELD_ID              ABT_MAIN.LMBW_ABT_FORM_FIELDS.FIELD_ID%TYPE;
+	ERROR_MSG                 VARCHAR2(255);
+	ERROR_ID                  INTEGER;
+	ERROR_CODE                INTEGER;
+	field_name_gf_id                     number;
+    field_name_ff_id                     number;
+    new_validator_id                     number;
+    formfield_gf_id                      number;
+    formfield_ff_id                      number;
+    i_logical_page_id                    lmbw_abt_logical_pages.logical_page_id%type;
+	NEW_LOGICAL_PAGE_ID					lmbw_abt_logical_pages.logical_page_id%type;
+    i_pg_order                           number;
+    i_pg_name                            lmbw_abt_pages.name%type;
+    o_pg_id                              lmbw_abt_pages.page_id%type;
+    i_pg_url                             lmbw_abt_pages.page_url%type;
+    r_code                               number;
+    error_id_to_insert                   ABT_MAIN.lmbw_abt_validation_errors.error_id%type;
+    I_CE_TYPE_ID                  ABT_MAIN.LMBW_ABT_CE_TYPES.CE_TYPE_ID%TYPE;
+    I_CE_CONTENT_TYPE             ABT_MAIN.LMBW_ABT_CE_VALUES.CONTENT_TYPE%TYPE;
+    I_CONTENT_ELEMENT_ID          ABT_MAIN.LMBW_ABT_CONTENT_ELEMENTS.CONTENT_ELEMENT_ID%TYPE;
+    I_CONTENT_ELEMENT_NAME        ABT_MAIN.LMBW_ABT_CONTENT_ELEMENTS.NAME%TYPE;
+    I_CE_DEFAULT_VALUE            ABT_MAIN.LMBW_ABT_CE_VALUES.E_VALUE%TYPE;
+    I_CE_DEFAULT_VALUE_ID         ABT_MAIN.LMBW_ABT_CE_VALUES.CE_VALUE_ID%TYPE;
+    I_CE_VALUE                    VARCHAR2(20000);
+
+BEGIN
+    USER_NAME := '{{username}}';
+    REF_NUMBER := '{{ticketNumber}}';
+
+    -------------------------------------------------
+    -- LRE Mobile LP
+    -------------------------------------------------
+    TEMPLATE_PRES_ID := {{template_pres_id}};
+    NEW_PRES_ID := {{new_pres_id}};
+    NEW_PRES_NAME := '{{newPresName}}';
+
+	-------------------------------------------------
+	-- CREATING NEW PRESENTATION
+	-------------------------------------------------
+    DBMS_OUTPUT.PUT_LINE('creating new presentation ' || NEW_PRES_ID);
+    ERROR_CODE := ABT_MAIN.LMBW_ABT_DEFINITIONS_PKG.COPY_PRESENTATION(USER_NAME, TEMPLATE_PRES_ID, REF_NUMBER, NEW_PRES_NAME, NEW_PRES_ID, null, NEW_PRES_ID, ERROR_MSG);
+    IF ERROR_CODE <> 0 THEN
+        DBMS_OUTPUT.PUT_LINE('ERROR: ' || ERROR_CODE || ': ' || ERROR_MSG);
+        RETURN;
+    END IF;
+{{delete_resource}}
+{{add_resource}}
+END;
+/
+COMMIT;
