@@ -61,8 +61,8 @@ BEGIN
     -------------------------------------------------
     -- LRE Mobile LP
     -------------------------------------------------
-    TEMPLATE_PRES_ID := {{template_pres_id}};
-    NEW_PRES_ID := {{new_pres_id}};
+    TEMPLATE_PRES_ID := {{templatePresId}};
+    NEW_PRES_ID := {{newpresId}};
     NEW_PRES_NAME := '{{newPresName}}';
 
 	-------------------------------------------------
